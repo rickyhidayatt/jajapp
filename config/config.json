@@ -1,4 +1,0 @@
-{
-    "HTTP_PORT": ":8000",
-    "PG_CONNECTION": "user=postgres password=Repsol12 host=localhost port=5432 dbname=xpora sslmode=disable"
-}
