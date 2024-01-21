@@ -12,7 +12,7 @@ type UserFormatter struct {
 	Address string    `json:"address"`
 }
 
-func FormatUser(user model.Users) UserFormatter {
+func FormatLoginUser(user model.Users) UserFormatter {
 	formatter := UserFormatter{
 		Uuid:    user.Uuid,
 		Name:    user.Name,

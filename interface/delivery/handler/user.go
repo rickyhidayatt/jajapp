@@ -40,7 +40,7 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	formatter := formatter.FormatUser(loginUser)
+	formatter := formatter.FormatLoginUser(loginUser)
 
 	response := utils.ApiResponse("successfully login", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
