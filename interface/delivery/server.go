@@ -6,6 +6,7 @@ import (
 	"github.com/jajapp/database"
 	"github.com/jajapp/domain/repository"
 	"github.com/jajapp/domain/service"
+	"github.com/jajapp/interface/delivery/auth"
 	"github.com/jajapp/interface/delivery/handler"
 )
 
@@ -16,8 +17,9 @@ func Run() {
 
 	//USER
 	user := service.NewUserUsecase(repo)
+	auth := auth.NewService()
 
-	userHandler := handler.NewUserHandler(user)
+	userHandler := handler.NewUserHandler(user, auth)
 
 	router := gin.Default()
 	router.Use(cors.Default())

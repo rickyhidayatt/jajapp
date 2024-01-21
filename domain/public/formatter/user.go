@@ -10,14 +10,16 @@ type UserFormatter struct {
 	Name    string    `json:"name"`
 	Email   string    `json:"email"`
 	Address string    `json:"address"`
+	Token   string    `json:"token"`
 }
 
-func FormatLoginUser(user model.Users) UserFormatter {
+func FormatLoginUser(user model.Users, token string) UserFormatter {
 	formatter := UserFormatter{
 		Uuid:    user.Uuid,
 		Name:    user.Name,
 		Email:   user.Email,
 		Address: user.Address,
+		Token:   token,
 	}
 
 	return formatter

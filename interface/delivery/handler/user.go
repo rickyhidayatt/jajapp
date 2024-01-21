@@ -7,15 +7,20 @@ import (
 	"github.com/jajapp/domain/public/formatter"
 	"github.com/jajapp/domain/public/input"
 	"github.com/jajapp/domain/service"
+	"github.com/jajapp/interface/delivery/auth"
 	"github.com/jajapp/utils"
 )
 
 type userHandler struct {
 	userService service.UserServiceInterface
+	authService auth.Service
 }
 
-func NewUserHandler(us service.UserServiceInterface) *userHandler {
-	return &userHandler{userService: us}
+func NewUserHandler(us service.UserServiceInterface, au auth.Service) *userHandler {
+	return &userHandler{
+		userService: us,
+		authService: au,
+	}
 }
 
 func (h *userHandler) LoginUser(c *gin.Context) {
@@ -40,7 +45,14 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	formatter := formatter.FormatLoginUser(loginUser)
+	token, err := h.authService.GenerateToken(loginUser.Uuid)
+	if err != nil {
+		response := utils.ApiResponse("failed login your account", http.StatusBadRequest, "auth login error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	formatter := formatter.FormatLoginUser(loginUser, token)
 
 	response := utils.ApiResponse("successfully login", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
