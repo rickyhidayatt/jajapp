@@ -24,7 +24,7 @@ func NewUserHandler(us service.UserServiceInterface, au auth.Service) *userHandl
 }
 
 func (h *userHandler) LoginUser(c *gin.Context) {
-	var input input.LoginUser
+	var input input.LoginUserRequest
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
@@ -52,8 +52,31 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	formatter := formatter.FormatLoginUser(loginUser, token)
+	formatter := formatter.UserResponse(loginUser, token)
 
 	response := utils.ApiResponse("successfully login", http.StatusOK, "success", formatter)
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) RegisterUser(c *gin.Context) {
+
+	var input input.RegisterUserRequest
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		response := utils.ApiResponse("Server Error", http.StatusBadRequest, "error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.userService.Register(input)
+	if err != nil {
+		response := utils.ApiResponse("failed register your account", http.StatusInternalServerError, "error duplicate email", err.Error())
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := utils.ApiResponse("successfully register your account", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+
 }

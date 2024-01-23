@@ -26,7 +26,8 @@ func Run() {
 	api := router.Group("api/v1")
 
 	// user Endpoint
-	api.POST("/login", userHandler.LoginUser)
+	api.POST("/user/login", userHandler.LoginUser)
+	api.POST("/user/register", userHandler.RegisterUser)
 	api.GET("/")
 	router.Run()
 }
