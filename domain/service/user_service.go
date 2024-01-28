@@ -71,6 +71,8 @@ func (s *userService) Register(input input.RegisterUserRequest) (*model.Users, e
 		IsSeller:    input.IsSeller,
 		IsDriver:    input.IsDriver,
 		Nik:         input.Nik,
+		Latitude:    input.Latitude,
+		Longitude:   input.Longitude,
 	}
 
 	newUser, err := s.userRepo.SaveUser(user)

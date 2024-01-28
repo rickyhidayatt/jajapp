@@ -20,4 +20,6 @@ type Users struct {
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 	IsVerified  bool
+	Latitude    float64
+	Longitude   float64
 }

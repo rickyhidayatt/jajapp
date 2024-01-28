@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/jajapp/domain/model"
 	"gorm.io/gorm"
 )
@@ -38,10 +40,16 @@ func (r *userRepository) FindByUuid(uuid string) (model.Users, error) {
 
 func (r *userRepository) SaveUser(user model.Users) (model.Users, error) {
 	query := `
-	INSERT INTO users (created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-	RETURNING created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik
+	INSERT INTO users (created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik, latitude, longitude)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+	RETURNING created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik, latitude, longitude
     `
+	// lat, _ := strconv.ParseFloat(user.Latitude, 64)
+	// long, _ := strconv.ParseFloat(user.Longitude, 64)
+
+	fmt.Println(user.Latitude, "lat")
+	fmt.Println(user.Longitude, "long")
+
 	rows, err := r.db.Raw(query,
 		user.CreatedAt,
 		user.Name,
@@ -53,6 +61,8 @@ func (r *userRepository) SaveUser(user model.Users) (model.Users, error) {
 		user.IsDriver,
 		user.Uuid,
 		user.Nik,
+		user.Latitude,
+		user.Longitude,
 	).Rows()
 
 	if err != nil {

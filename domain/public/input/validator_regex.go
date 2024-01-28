@@ -21,6 +21,7 @@ func GetValidator() Validation {
 		validator.RegisterValidation("valid_string", validateAlphanumericWithSpace, true)
 		validator.RegisterValidation("valid_nik", validateNik, true)
 		validator.RegisterValidation("valid_phone_number", phoneNumberValidator, true)
+		validator.RegisterValidation("valid_geo", geoValidator, true)
 
 		validation = Validation{
 			Validator: validator,
@@ -50,12 +51,18 @@ func phoneNumberValidator(fl validator.FieldLevel) bool {
 	return phoneRegex.MatchString(fl.Field().String())
 }
 
+func geoValidator(fl validator.FieldLevel) bool {
+	phoneRegex := regexp.MustCompile(`^[0-9]{0,19}(\.[0-9]{1,16})?$`)
+	return phoneRegex.MatchString(fl.Field().String())
+}
+
 func ValidateUserRequest(params interface{}) error {
 	validate := GetValidator().Validator
 	validate.RegisterValidation("name_validator", validateAlphanumericWithSpace, true)
 	validate.RegisterValidation("phone_number_validator", phoneNumberValidator, true)
 	validate.RegisterValidation("address_validator", validateAlphaNumericWithSpaceDot, true)
 	validate.RegisterValidation("nik_validator", validateNik, true)
+	validate.RegisterValidation("geo_validator", geoValidator, true)
 
 	return validate.Struct(params)
 }
