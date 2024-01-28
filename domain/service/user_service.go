@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -68,9 +67,10 @@ func (s *userService) Register(input input.RegisterUserRequest) (*model.Users, e
 		Email:       input.Email,
 		Password:    string(passwordHash),
 		Address:     input.Address,
-		PhoneNumber: strconv.Itoa(input.PhoneNumber),
+		PhoneNumber: input.PhoneNumber,
 		IsSeller:    input.IsSeller,
 		IsDriver:    input.IsDriver,
+		Nik:         input.Nik,
 	}
 
 	newUser, err := s.userRepo.SaveUser(user)

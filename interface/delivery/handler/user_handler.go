@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,9 +24,9 @@ func NewUserHandler(us service.UserServiceInterface, au auth.Service) *userHandl
 }
 
 func (h *userHandler) LoginUser(c *gin.Context) {
-	var input input.LoginUserRequest
+	var params input.LoginUserRequest
 
-	err := c.ShouldBindJSON(&input)
+	err := c.ShouldBindJSON(&params)
 	if err != nil {
 		errors := utils.FormatValidatorError(err)
 		errorsMessage := gin.H{"error": errors}
@@ -37,7 +36,7 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	loginUser, err := h.userService.Login(input)
+	loginUser, err := h.userService.Login(params)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 
@@ -60,20 +59,24 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
-	var input input.RegisterUserRequest
+	var params input.RegisterUserRequest
 
-	err := c.ShouldBindJSON(&input)
+	err := c.ShouldBindJSON(&params)
 	if err != nil {
 		response := utils.ApiResponse("Invalid request payload", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	userRegister, err := h.userService.Register(input)
+	err = input.ValidateUserRequest(params)
 	if err != nil {
-		// Log the error
-		log.Printf("Failed to register user: %v", err)
+		response := utils.ApiResponse("Validation error", http.StatusBadRequest, "error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 
+	userRegister, err := h.userService.Register(params)
+	if err != nil {
 		response := utils.ApiResponse("Failed to register user", http.StatusInternalServerError, "error", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return

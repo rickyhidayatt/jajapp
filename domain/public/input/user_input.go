@@ -6,11 +6,12 @@ type LoginUserRequest struct {
 }
 
 type RegisterUserRequest struct {
-	Name        string `json:"name" validate:"required"`
+	Name        string `json:"name" validate:"required,valid_string"`
 	Email       string `json:"email" binding:"required,email"`
 	Password    string `json:"password" binding:"required"`
-	PhoneNumber int    `json:"phone_number" validate:"required"`
-	Address     string `json:"address" validate:"required"`
+	PhoneNumber string `json:"phone_number" validate:"required,valid_phone_number"`
+	Address     string `json:"address" validate:"required,valid_address"`
 	IsSeller    bool   `json:"is_seller"`
 	IsDriver    bool   `json:"is_driver"`
+	Nik         string `json:"nik" validate:"required,valid_nik"`
 }

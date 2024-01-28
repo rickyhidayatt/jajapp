@@ -38,9 +38,9 @@ func (r *userRepository) FindByUuid(uuid string) (model.Users, error) {
 
 func (r *userRepository) SaveUser(user model.Users) (model.Users, error) {
 	query := `
-	INSERT INTO users (created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-	RETURNING created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid
+	INSERT INTO users (created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	RETURNING created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid, nik
     `
 	rows, err := r.db.Raw(query,
 		user.CreatedAt,
@@ -52,6 +52,7 @@ func (r *userRepository) SaveUser(user model.Users) (model.Users, error) {
 		user.IsSeller,
 		user.IsDriver,
 		user.Uuid,
+		user.Nik,
 	).Rows()
 
 	if err != nil {

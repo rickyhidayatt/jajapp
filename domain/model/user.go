@@ -16,6 +16,8 @@ type Users struct {
 	Address     string
 	IsSeller    bool
 	IsDriver    bool
+	Nik         string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	IsVerified  bool
 }

@@ -8,14 +8,16 @@ import (
 )
 
 type userResponse struct {
-	Uuid      uuid.UUID `json:"uuid"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	Address   string    `json:"address"`
-	Token     string    `json:"token"`
-	CreatedAt time.Time `json:"register_date"`
-	IsSeller  bool      `json:"is_seller"`
-	IsDriver  bool      `json:"is_driver"`
+	Uuid       uuid.UUID `json:"uuid"`
+	Name       string    `json:"name"`
+	Email      string    `json:"email"`
+	Address    string    `json:"address"`
+	Token      string    `json:"token"`
+	CreatedAt  time.Time `json:"register_date"`
+	IsSeller   bool      `json:"is_seller"`
+	IsDriver   bool      `json:"is_driver"`
+	IsVerified bool      `json:"is_verified"`
+	Nik        string    `json:"nik"`
 }
 
 func UserResponse(user model.Users, token string) userResponse {
@@ -28,6 +30,7 @@ func UserResponse(user model.Users, token string) userResponse {
 		IsSeller:  user.IsSeller,
 		IsDriver:  user.IsDriver,
 		CreatedAt: user.CreatedAt,
+		Nik:       user.Nik,
 	}
 
 	return formatter
