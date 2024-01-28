@@ -14,6 +14,8 @@ type Users struct {
 	Password    string
 	PhoneNumber string
 	Address     string
+	IsSeller    bool
+	IsDriver    bool
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }

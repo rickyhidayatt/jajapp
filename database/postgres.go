@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/jajapp/config"
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

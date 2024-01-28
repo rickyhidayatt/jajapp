@@ -14,6 +14,8 @@ type userResponse struct {
 	Address   string    `json:"address"`
 	Token     string    `json:"token"`
 	CreatedAt time.Time `json:"register_date"`
+	IsSeller  bool      `json:"is_seller"`
+	IsDriver  bool      `json:"is_driver"`
 }
 
 func UserResponse(user model.Users, token string) userResponse {
@@ -23,6 +25,8 @@ func UserResponse(user model.Users, token string) userResponse {
 		Email:     user.Email,
 		Address:   user.Address,
 		Token:     token,
+		IsSeller:  user.IsSeller,
+		IsDriver:  user.IsDriver,
 		CreatedAt: user.CreatedAt,
 	}
 
