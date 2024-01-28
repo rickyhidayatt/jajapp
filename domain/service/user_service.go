@@ -1,9 +1,11 @@
 package service
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jajapp/domain/model"
 	"github.com/jajapp/domain/public/input"
 	"github.com/jajapp/domain/repository"
@@ -12,8 +14,7 @@ import (
 
 type UserServiceInterface interface {
 	Login(input input.LoginUserRequest) (model.Users, error)
-	Register(input input.RegisterUserRequest) (model.Users, error)
-	UpdateProfile(input input.RegisterUserRequest) (model.Users, error)
+	Register(input input.RegisterUserRequest) (*model.Users, error)
 }
 
 type userService struct {
@@ -39,53 +40,43 @@ func (s *userService) Login(input input.LoginUserRequest) (model.Users, error) {
 	return user, nil
 }
 
-func (s *userService) Register(input input.RegisterUserRequest) (model.Users, error) {
+func (s *userService) Register(input input.RegisterUserRequest) (*model.Users, error) {
+	checkEmail, err := s.userRepo.FindEmail(input.Email)
 
-	checkEmail, err := s.userRepo.CheckEmail(input.Email)
-	if err != nil {
-		return model.Users{}, err
+	if checkEmail.Email != "" {
+		return nil, errors.New("email already exists")
 	}
 
-	if checkEmail != false {
-		return model.Users{}, err
+	if input.IsSeller == true && input.IsDriver == true {
+		return nil, errors.New("You cannot be both a seller and a driver")
+	}
+
+	userID, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.MinCost)
 	if err != nil {
-		return model.Users{}, err
+		return nil, err
 	}
 
 	var user = model.Users{
 		CreatedAt:   time.Now(),
+		Uuid:        userID,
 		Name:        input.Name,
 		Email:       input.Email,
 		Password:    string(passwordHash),
 		Address:     input.Address,
 		PhoneNumber: strconv.Itoa(input.PhoneNumber),
+		IsSeller:    input.IsSeller,
+		IsDriver:    input.IsDriver,
 	}
 
 	newUser, err := s.userRepo.SaveUser(user)
 	if err != nil {
-		return newUser, err
+		return nil, err
 	}
 
-	return newUser, nil
-}
-
-func (s *userService) UpdateProfile(input input.RegisterUserRequest) (model.Users, error) {
-
-	var user = model.Users{
-		UpdatedAt:   time.Now(),
-		Name:        input.Name,
-		Email:       input.Email,
-		Address:     input.Address,
-		PhoneNumber: strconv.Itoa(input.PhoneNumber),
-	}
-
-	newUser, err := s.userRepo.Update(user)
-	if err != nil {
-		return newUser, err
-	}
-
-	return newUser, nil
+	return &newUser, nil
 }

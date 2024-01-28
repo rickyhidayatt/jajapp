@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -59,24 +60,34 @@ func (h *userHandler) LoginUser(c *gin.Context) {
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
-
 	var input input.RegisterUserRequest
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		response := utils.ApiResponse("Server Error", http.StatusBadRequest, "error", err.Error())
+		response := utils.ApiResponse("Invalid request payload", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	_, err = h.userService.Register(input)
+	userRegister, err := h.userService.Register(input)
 	if err != nil {
-		response := utils.ApiResponse("failed register your account", http.StatusInternalServerError, "error duplicate email", err.Error())
+		// Log the error
+		log.Printf("Failed to register user: %v", err)
+
+		response := utils.ApiResponse("Failed to register user", http.StatusInternalServerError, "error", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := utils.ApiResponse("successfully register your account", http.StatusOK, "success", nil)
-	c.JSON(http.StatusOK, response)
+	token, err := h.authService.GenerateToken(userRegister.Uuid)
+	if err != nil {
+		response := utils.ApiResponse("failed login your account", http.StatusBadRequest, "auth login error", err.Error())
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
 
+	formatter := formatter.UserResponse(*userRegister, token)
+
+	response := utils.ApiResponse("Successfully registered user", http.StatusOK, "success", formatter)
+	c.JSON(http.StatusOK, response)
 }

@@ -12,8 +12,6 @@ type UserRepositoryInterface interface {
 	FindEmail(email string) (model.Users, error)
 	FindByUuid(uuid string) (model.Users, error)
 	SaveUser(user model.Users) (model.Users, error)
-	Update(user model.Users) (model.Users, error)
-	CheckEmail(email string) (bool, error)
 }
 
 func NewUserRepository(g *gorm.DB) UserRepositoryInterface {
@@ -39,26 +37,35 @@ func (r *userRepository) FindByUuid(uuid string) (model.Users, error) {
 }
 
 func (r *userRepository) SaveUser(user model.Users) (model.Users, error) {
-	err := r.db.Create(&user).Error
-	if err != nil {
-		return user, err
-	}
-	return user, nil
-}
+	query := `
+	INSERT INTO users (created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	RETURNING created_at, name, email, password, address, phone_number, is_seller, is_driver, uuid
+    `
+	rows, err := r.db.Raw(query,
+		user.CreatedAt,
+		user.Name,
+		user.Email,
+		user.Password,
+		user.Address,
+		user.PhoneNumber,
+		user.IsSeller,
+		user.IsDriver,
+		user.Uuid,
+	).Rows()
 
-func (r *userRepository) Update(user model.Users) (model.Users, error) {
-	err := r.db.Save(&user).Error
 	if err != nil {
-		return user, err
+		return model.Users{}, err
 	}
 
-	return user, nil
-}
+	defer rows.Close()
 
-func (r *userRepository) CheckEmail(email string) (bool, error) {
-	err := r.db.Where("email = ?", email).Error
-	if err != nil {
-		return false, err
+	var savedUser model.Users
+	if rows.Next() {
+		if err := r.db.ScanRows(rows, &savedUser); err != nil {
+			return model.Users{}, err
+		}
 	}
-	return true, nil
+
+	return savedUser, nil
 }

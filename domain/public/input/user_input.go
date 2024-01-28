@@ -11,4 +11,6 @@ type RegisterUserRequest struct {
 	Password    string `json:"password" binding:"required"`
 	PhoneNumber int    `json:"phone_number" validate:"required"`
 	Address     string `json:"address" validate:"required"`
+	IsSeller    bool   `json:"is_seller"`
+	IsDriver    bool   `json:"is_driver"`
 }
