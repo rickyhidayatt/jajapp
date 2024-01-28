@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "github.com/jajapp/interface/delivery"
 
+func main() {
+	delivery.Run()
 }
